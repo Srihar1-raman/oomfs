@@ -1,0 +1,27 @@
+{
+  "name": "OOMF Analyzer",
+  "short_name": "OOMF Analyzer",
+  "description": "Twitter Personality Analysis Tool",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#EF88AD",
+  "theme_color": "#EF88AD",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["entertainment", "social", "utilities"],
+  "lang": "en",
+  "dir": "ltr"
+}

@@ -224,7 +224,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#EF88AD] text-black p-6 font-comic">
       {/* Header */}
-      <div className="text-center mb-12">
+        <div className="text-center mb-12">
         <h1 className="text-4xl md:text-6xl font-bold mb-4">
           <span className="text-white">oomf-</span>
           <span className="text-white">analyzer</span>
@@ -423,8 +423,8 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </div>
-      )}
+            </div>
+          )}
 
       {/* AI Analysis Section - FIXED LAYOUT */}
       {userData && (
@@ -472,14 +472,14 @@ export default function Home() {
                   {userData.percentages.performative >= 70 ? 'Very High' : 
                    userData.percentages.performative >= 50 ? 'High' : 
                    userData.percentages.performative >= 30 ? 'Moderate' : 'Low'}
-                </div>
+                  </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
                   <div 
                     className="bg-gray-600 h-3 rounded-full transition-all duration-1000" 
                     style={{width: `${userData.percentages.performative}%`}}
                   ></div>
-                </div>
-              </div>
+                  </div>
+                  </div>
 
               {/* Cry For Help */}
               <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-5 text-center shadow-sm hover:shadow-md transition-shadow">
@@ -489,7 +489,7 @@ export default function Home() {
                   {userData.percentages.cry_for_help >= 70 ? 'Very High' : 
                    userData.percentages.cry_for_help >= 50 ? 'High' : 
                    userData.percentages.cry_for_help >= 30 ? 'Moderate' : 'Low'}
-                </div>
+                  </div>
                 <div className="w-full bg-blue-200 rounded-full h-3">
                   <div 
                     className="bg-blue-500 h-3 rounded-full transition-all duration-1000" 
@@ -572,15 +572,10 @@ export default function Home() {
                   @lowkeyverybored
                 </a>
               </div>
-            </div>
-            
+        </div>
+
             <div className="text-center">
-              <p className="text-xs text-gray-500 leading-relaxed">
-                <strong>Disclaimer:</strong> This tool is for entertainment purposes only. Analysis results are AI-generated interpretations 
-                and should not be considered as professional psychological assessment. We do not store or collect personal data. 
-                All analysis is performed on publicly available content through legitimate API services. 
-                Use responsibly and respect others&apos; privacy.
-              </p>
+              <p className="text-xs text-gray-500 leading-relaxed"> <strong>Disclaimer:</strong> This tool is for entertainment and educational purposes only. All analysis results are AI-generated interpretations based on publicly available content and should not be considered as professional psychological assessment, medical advice, or factual personality evaluation. We do not store, collect, or retain personal data. Analysis is performed using legitimate third-party API services on publicly accessible content only. Results may not accurately reflect actual personality traits or behaviors. By using this tool, you acknowledge that you are doing so at your own discretion and risk. Use responsibly, respect others&apos; privacy, and do not use this tool to harass, discriminate against, or make important decisions about individuals. </p> 
             </div>
           </div>
         </div>
