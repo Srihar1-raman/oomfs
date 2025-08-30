@@ -267,11 +267,16 @@ export default function Home() {
               </div>
               {userData?.quadrant === 'desperate' && !isAnalyzing && (
                 <div className="absolute inset-0 flex items-center justify-center z-10">
-                  <img
-                    src="/apple-fun.jpg"
-                    alt={userData.username}
-                    className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-3 sm:border-4 border-[#A53860] shadow-xl ring-2 sm:ring-4 ring-[#EF88AD] object-cover"
-                  />
+                  <div className="text-center">
+                    <img
+                      src="/apple-fun.jpg"
+                      alt={userData.username}
+                      className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-3 sm:border-4 border-[#A53860] shadow-xl ring-2 sm:ring-4 ring-[#EF88AD] object-cover"
+                    />
+                    <div className="mt-2 text-xs sm:text-sm font-bold text-[#A53860] bg-white/90 px-2 py-1 rounded-full border border-[#A53860]/30">
+                      @{userData.username}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -286,11 +291,16 @@ export default function Home() {
               </div>
               {userData?.quadrant === 'performative' && !isAnalyzing && (
                 <div className="absolute inset-0 flex items-center justify-center z-10">
-                  <img
-                    src="/apple-fun.jpg"
-                    alt={userData.username}
-                    className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-3 sm:border-4 border-[#A53860] shadow-xl ring-2 sm:ring-4 ring-[#EF88AD] object-cover"
-                  />
+                  <div className="text-center">
+                    <img
+                      src="/apple-fun.jpg"
+                      alt={userData.username}
+                      className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-3 sm:border-4 border-[#A53860] shadow-xl ring-2 sm:ring-4 ring-[#EF88AD] object-cover"
+                    />
+                    <div className="mt-2 text-xs sm:text-sm font-bold text-[#A53860] bg-white/90 px-2 py-1 rounded-full border border-[#A53860]/30">
+                      @{userData.username}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -305,11 +315,16 @@ export default function Home() {
               </div>
               {userData?.quadrant === 'cry-for-help' && !isAnalyzing && (
                 <div className="absolute inset-0 flex items-center justify-center z-10">
-                  <img
-                    src="/apple-fun.jpg"
-                    alt={userData.username}
-                    className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-3 sm:border-4 border-blue-500 shadow-xl ring-2 sm:ring-4 ring-blue-200 object-cover"
-                  />
+                  <div className="text-center">
+                    <img
+                      src="/apple-fun.jpg"
+                      alt={userData.username}
+                      className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-3 sm:border-4 border-blue-500 shadow-xl ring-2 sm:ring-4 ring-blue-200 object-cover"
+                    />
+                    <div className="mt-2 text-xs sm:text-sm font-bold text-blue-600 bg-white/90 px-2 py-1 rounded-full border border-blue-500/30">
+                      @{userData.username}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -324,11 +339,16 @@ export default function Home() {
               </div>
               {userData?.quadrant === 'ragebaiter' && !isAnalyzing && (
                 <div className="absolute inset-0 flex items-center justify-center z-10">
-                  <img
-                    src="/apple-fun.jpg"
-                    alt={userData.username}
-                    className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-3 sm:border-4 border-green-500 shadow-xl ring-2 sm:ring-4 ring-green-200 object-cover"
-                  />
+                  <div className="text-center">
+                    <img
+                      src="/apple-fun.jpg"
+                      alt={userData.username}
+                      className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-3 sm:border-4 border-green-500 shadow-xl ring-2 sm:ring-4 ring-green-200 object-cover"
+                    />
+                    <div className="mt-2 text-xs sm:text-sm font-bold text-green-600 bg-white/90 px-2 py-1 rounded-full border border-green-500/30">
+                      @{userData.username}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
