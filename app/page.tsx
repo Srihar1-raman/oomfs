@@ -1,103 +1,570 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+
+interface AICoordinates {
+  desperate: number;
+  performative: number;
+  cry_for_help: number;
+  ragebaiter: number;
+}
+
+interface AIResponse {
+  coordinates: AICoordinates;
+  confidence: number;
+  reasoning: string;
+  key_indicators: string[];
+}
+
+interface UserData {
+  username: string;
+  profilePicture: string;
+  coordinates: AICoordinates;
+  percentages: {
+    desperate: number;
+    performative: number;
+    cry_for_help: number;
+    ragebaiter: number;
+  };
+  quadrant: 'desperate' | 'performative' | 'cry-for-help' | 'ragebaiter' | null;
+  analysis: string;
+  confidence: number;
+}
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [username, setUsername] = useState('');
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [profilePosition, setProfilePosition] = useState({ x: 50, y: 50 });
+  const [isCopying, setIsCopying] = useState(false);
+  const chartRef = useRef<HTMLDivElement>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  // Roaming animation during analysis - Move through all quadrants
+  useEffect(() => {
+    if (!isAnalyzing) return;
+
+    let quadrantIndex = 0;
+    const quadrantPositions = [
+      { x: 25, y: 25 }, // Top-left (Desperate)
+      { x: 75, y: 25 }, // Top-right (Performative)
+      { x: 25, y: 75 }, // Bottom-left (Cry for Help)
+      { x: 75, y: 75 }, // Bottom-right (Ragebaiter)
+    ];
+
+    const interval = setInterval(() => {
+      // Add some randomness around each quadrant center
+      const basePosition = quadrantPositions[quadrantIndex];
+      const randomOffset = {
+        x: (Math.random() - 0.5) * 15, // Random offset ±7.5%
+        y: (Math.random() - 0.5) * 15
+      };
+      
+      setProfilePosition({
+        x: Math.max(15, Math.min(85, basePosition.x + randomOffset.x)),
+        y: Math.max(15, Math.min(85, basePosition.y + randomOffset.y))
+      });
+      
+      quadrantIndex = (quadrantIndex + 1) % quadrantPositions.length;
+    }, 800);
+
+    return () => clearInterval(interval);
+  }, [isAnalyzing]);
+
+  // Convert AI coordinates to quadrant placement
+  const getQuadrantFromCoordinates = (coordinates: AICoordinates): 'desperate' | 'performative' | 'cry-for-help' | 'ragebaiter' => {
+    // Find the highest coordinate value to determine dominant quadrant
+    const maxValue = Math.max(...Object.values(coordinates));
+    
+    if (coordinates.desperate === maxValue) return 'desperate';
+    if (coordinates.performative === maxValue) return 'performative';
+    if (coordinates.cry_for_help === maxValue) return 'cry-for-help';
+    return 'ragebaiter';
+  };
+
+  // Convert coordinates to visual position on the grid
+  const getPositionFromCoordinates = (coordinates: AICoordinates) => {
+    // Map coordinates to grid positions
+    // desperate: top-left, performative: top-right, cry_for_help: bottom-left, ragebaiter: bottom-right
+    
+    // Determine the dominant quadrant
+    const maxValue = Math.max(...Object.values(coordinates));
+    let quadrantPosition;
+    
+    if (coordinates.desperate === maxValue) {
+      quadrantPosition = { x: 25, y: 25 }; // Top-left
+    } else if (coordinates.performative === maxValue) {
+      quadrantPosition = { x: 75, y: 25 }; // Top-right
+    } else if (coordinates.cry_for_help === maxValue) {
+      quadrantPosition = { x: 25, y: 75 }; // Bottom-left
+    } else {
+      quadrantPosition = { x: 75, y: 75 }; // Bottom-right (ragebaiter)
+    }
+    
+    return quadrantPosition;
+  };
+
+  // Copy chart to clipboard as PNG
+  const copyChartToClipboard = async () => {
+    if (!chartRef.current || !userData) return;
+    
+    setIsCopying(true);
+    
+    try {
+      // Use html2canvas to capture the chart
+      const html2canvas = (await import('html2canvas')).default;
+      const canvas = await html2canvas(chartRef.current, {
+        backgroundColor: 'white',
+        scale: 2, // Higher quality
+        useCORS: true,
+        allowTaint: true
+      });
+      
+      // Convert to blob
+      canvas.toBlob(async (blob: Blob | null) => {
+        if (blob) {
+          try {
+            // Copy to clipboard
+            await navigator.clipboard.write([
+              new ClipboardItem({
+                'image/png': blob
+              })
+            ]);
+            
+            // Show success message
+            alert('Chart copied to clipboard! 🎉');
+          } catch (err) {
+            // Fallback: download the image
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${userData.username}-wojak-chart.png`;
+            a.click();
+            URL.revokeObjectURL(url);
+            alert('Chart downloaded as PNG! 📥');
+          }
+        }
+      }, 'image/png');
+    } catch (error) {
+      console.error('Error copying chart:', error);
+      alert('Failed to copy chart. Please try again.');
+    } finally {
+      setIsCopying(false);
+    }
+  };
+
+  const analyzeUser = async () => {
+    if (!username) return;
+    
+    setIsAnalyzing(true);
+    
+    // Simulate AI analysis delay
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    
+    // Mock AI response with coordinates - in real app, this would come from your AI API
+    const mockAIResponse: AIResponse = {
+      coordinates: {
+        desperate: Math.random() * 2 - 1, // Random value between -1 and 1
+        performative: Math.random() * 2 - 1,
+        cry_for_help: Math.random() * 2 - 1,
+        ragebaiter: Math.random() * 2 - 1
+      },
+      confidence: 0.7 + Math.random() * 0.3, // Random confidence between 0.7 and 1.0
+      reasoning: "Based on tweet analysis, this user shows patterns of...",
+      key_indicators: ["frequent attention-seeking posts", "emotional outbursts", "controversial takes"]
+    };
+    
+    const mockProfilePicture = '/apple-fun.jpg';
+    
+    // Determine quadrant and position from AI coordinates
+    const quadrant = getQuadrantFromCoordinates(mockAIResponse.coordinates);
+    const position = getPositionFromCoordinates(mockAIResponse.coordinates);
+    
+    // Convert coordinates to percentages for better readability
+    const coordinatePercentages = {
+      desperate: Math.round(((mockAIResponse.coordinates.desperate + 1) / 2) * 100),
+      performative: Math.round(((mockAIResponse.coordinates.performative + 1) / 2) * 100),
+      cry_for_help: Math.round(((mockAIResponse.coordinates.cry_for_help + 1) / 2) * 100),
+      ragebaiter: Math.round(((mockAIResponse.coordinates.ragebaiter + 1) / 2) * 100)
+    };
+
+    // Generate more intuitive analysis text
+    const getIntensityLevel = (percentage: number) => {
+      if (percentage >= 80) return 'extremely high';
+      if (percentage >= 60) return 'high';
+      if (percentage >= 40) return 'moderate';
+      if (percentage >= 20) return 'low';
+      return 'very low';
+    };
+
+    const analysis = `Analysis shows this user is ${quadrant === 'desperate' ? 'desperately seeking validation and attention' : quadrant === 'performative' ? 'performing for an audience rather than being authentic' : quadrant === 'cry-for-help' ? 'expressing genuine distress and seeking support' : 'intentionally provoking reactions and controversy'}. Their behavior breakdown: ${coordinatePercentages.desperate}% desperate tendencies (${getIntensityLevel(coordinatePercentages.desperate)}), ${coordinatePercentages.performative}% performative behavior (${getIntensityLevel(coordinatePercentages.performative)}), ${coordinatePercentages.cry_for_help}% cry for help signals (${getIntensityLevel(coordinatePercentages.cry_for_help)}), and ${coordinatePercentages.ragebaiter}% rage-baiting content (${getIntensityLevel(coordinatePercentages.ragebaiter)}).`;
+    
+    setUserData({
+      username: username,
+      profilePicture: mockProfilePicture,
+      coordinates: mockAIResponse.coordinates,
+      percentages: coordinatePercentages,
+      quadrant: quadrant,
+      analysis: analysis,
+      confidence: mockAIResponse.confidence
+    });
+    
+    // Move profile picture to calculated position
+    setProfilePosition(position);
+    
+    setIsAnalyzing(false);
+    setUsername('');
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      analyzeUser();
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#EF88AD] text-black p-6 font-comic">
+      {/* Header */}
+      <div className="text-center mb-12">
+        <h1 className="text-4xl md:text-6xl font-bold mb-4">
+          <span className="text-white">oomf-</span>
+          <span className="text-white">analyzer</span>
+        </h1>
+        <p className="text-[#670D2F] text-lg font-medium">
+          discover your twitter personality type
+        </p>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="w-full max-w-sm sm:max-w-md md:max-w-lg mx-auto mb-8 px-4">
+        {/* Quadrant Grid - FIXED POSITIONING */}
+        <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 shadow-lg mb-4 relative overflow-visible" ref={chartRef}>
+          {/* Grid Background */}
+          <div className="absolute inset-0 opacity-30">
+            <svg className="w-full h-full">
+              <defs>
+                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#d1d5db" strokeWidth="0.5"/>
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-0 aspect-square relative bg-white/60 backdrop-blur-sm rounded-lg border border-gray-300/50 w-full mx-auto">
+            {/* Central Dividing Lines */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gray-400/60"></div>
+              <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gray-400/60"></div>
+            </div>
+            
+            {/* Desperate - Top Left */}
+            <div className="bg-gradient-to-br from-pink-100/60 to-pink-200/40 border-r border-b border-gray-300/50 relative flex items-center justify-center group hover:from-pink-200/80 hover:to-pink-300/60 transition-all duration-300">
+              <div className="absolute inset-0 bg-pink-500/5"></div>
+              <div className="absolute top-3 left-1/2 transform -translate-x-1/2 z-20">
+                <span className="text-xs sm:text-sm font-bold text-pink-600 bg-pink-50/90 px-3 py-1 rounded-full border border-pink-300 shadow-sm">
+                  Desperate
+                </span>
+              </div>
+              {userData?.quadrant === 'desperate' && !isAnalyzing && (
+                <div className="absolute inset-0 flex items-center justify-center z-10">
+                  <img
+                    src="/apple-fun.jpg"
+                    alt={userData.username}
+                    className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-3 sm:border-4 border-[#A53860] shadow-xl ring-2 sm:ring-4 ring-[#EF88AD] object-cover"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Performative - Top Right */}
+            <div className="bg-gradient-to-bl from-gray-100/60 to-gray-200/40 border-l border-b border-gray-300/50 relative flex items-center justify-center group hover:from-gray-200/80 hover:to-gray-300/60 transition-all duration-300">
+              <div className="absolute inset-0 bg-gray-600/5"></div>
+              <div className="absolute top-3 left-1/2 transform -translate-x-1/2 z-20">
+                <span className="text-xs sm:text-sm font-bold text-gray-800 bg-gray-100/90 px-3 py-1 rounded-full border border-gray-400 shadow-sm">
+                  Performative
+                </span>
+              </div>
+              {userData?.quadrant === 'performative' && !isAnalyzing && (
+                <div className="absolute inset-0 flex items-center justify-center z-10">
+                  <img
+                    src="/apple-fun.jpg"
+                    alt={userData.username}
+                    className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-3 sm:border-4 border-[#A53860] shadow-xl ring-2 sm:ring-4 ring-[#EF88AD] object-cover"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Cry for Help - Bottom Left */}
+            <div className="bg-gradient-to-tr from-blue-100/60 to-blue-200/40 border-r border-t border-gray-300/50 relative flex items-center justify-center group hover:from-blue-200/80 hover:to-blue-300/60 transition-all duration-300">
+              <div className="absolute inset-0 bg-blue-500/5"></div>
+              <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 z-20">
+                <span className="text-xs sm:text-sm font-bold text-blue-600 bg-blue-50/90 px-3 py-1 rounded-full border border-blue-300 shadow-sm whitespace-nowrap">
+                  Cry For Help
+                </span>
+              </div>
+              {userData?.quadrant === 'cry-for-help' && !isAnalyzing && (
+                <div className="absolute inset-0 flex items-center justify-center z-10">
+                  <img
+                    src="/apple-fun.jpg"
+                    alt={userData.username}
+                    className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-3 sm:border-4 border-blue-500 shadow-xl ring-2 sm:ring-4 ring-blue-200 object-cover"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Ragebaiter - Bottom Right */}
+            <div className="bg-gradient-to-tl from-green-100/60 to-green-200/40 border-l border-t border-gray-300/50 relative flex items-center justify-center group hover:from-green-200/80 hover:to-green-300/60 transition-all duration-300">
+              <div className="absolute inset-0 bg-green-500/5"></div>
+              <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 z-20">
+                <span className="text-xs sm:text-sm font-bold text-green-600 bg-green-50/90 px-3 py-1 rounded-full border border-green-300 shadow-sm">
+                  Ragebaiter
+                </span>
+              </div>
+              {userData?.quadrant === 'ragebaiter' && !isAnalyzing && (
+                <div className="absolute inset-0 flex items-center justify-center z-10">
+                  <img
+                    src="/apple-fun.jpg"
+                    alt={userData.username}
+                    className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-3 sm:border-4 border-green-500 shadow-xl ring-2 sm:ring-4 ring-green-200 object-cover"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Username Input - Under the Chart */}
+        <div className="text-center px-4 mb-8">
+          <h2 className="text-xl sm:text-2xl font-bold mb-6 text-black">personality analyzer</h2>
+          <p className="text-gray-800 mb-6 text-sm sm:text-base font-medium">enter your username and discover your twitter behavior type</p>
+          
+          <div className="max-w-md mx-auto space-y-5">
+            <input
+              type="text"
+              placeholder="@username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              onKeyPress={handleKeyPress}
+              className="w-full bg-white border-2 border-[#A53860] text-gray-900 placeholder-gray-600 text-base sm:text-lg p-3 sm:p-4 h-12 sm:h-14 rounded-lg font-comic focus:border-[#3A0519] focus:outline-none transition-colors"
+            />
+            <p className="text-[#670D2F] text-sm text-center font-medium">
+              Just type the username without the @ symbol
+            </p>
+            <button
+              onClick={analyzeUser}
+              disabled={isAnalyzing || !username}
+              className="w-full bg-[#A53860] hover:bg-[#670D2F] text-white text-base sm:text-lg p-3 sm:p-4 h-12 sm:h-14 rounded-lg font-comic border-2 border-[#A53860] hover:border-[#670D2F] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isAnalyzing ? 'analyzing...' : 'see results'}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Copy Chart Button - Only show when results are available */}
+      {userData && (
+        <div className="w-full max-w-sm sm:max-w-md md:max-w-lg mx-auto mb-8 text-center px-4">
+          <button
+            onClick={copyChartToClipboard}
+            disabled={isCopying}
+            className="bg-[#670D2F] hover:bg-[#3A0519] text-white text-base lg:text-lg px-8 py-4 rounded-lg font-comic border-2 border-[#670D2F] hover:border-[#3A0519] transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-bold"
+          >
+            {isCopying ? 'copying...' : '📋 copy chart to clipboard'}
+          </button>
+          <p className="text-gray-800 text-xs sm:text-sm mt-3 font-medium">
+            Copy your personality chart with profile picture as a PNG image
+          </p>
+        </div>
+      )}
+
+      {/* Roaming Avatar - OVERLAID ON CHART */}
+      {isAnalyzing && (
+        <div className="w-full max-w-sm sm:max-w-md md:max-w-lg mx-auto mb-6 relative pointer-events-none" style={{ marginTop: '-360px', height: '280px', zIndex: 10 }}>
+          <div className="absolute inset-0 flex justify-center">
+            <div className="relative w-full">
+              <div
+                className="absolute w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 transition-all duration-700 ease-in-out"
+                style={{
+                  left: `${profilePosition.x}%`,
+                  top: `${profilePosition.y}%`,
+                  transform: 'translate(-50%, -50%)'
+                }}
+              >
+                <img
+                  src="/apple-fun.jpg"
+                  alt="Analyzing..."
+                  className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 rounded-full border-3 sm:border-4 border-[#A53860] animate-pulse shadow-xl ring-2 sm:ring-4 ring-[#EF88AD]/50 object-cover"
+                />
+                <div className="absolute -bottom-6 sm:-bottom-8 left-1/2 transform -translate-x-1/2 bg-[#3A0519]/90 text-white px-2 py-1 rounded-full text-xs font-bold border border-[#EF88AD]/30 backdrop-blur-sm">
+                  analyzing...
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Analysis Section - FIXED LAYOUT */}
+      {userData && (
+        <div className="w-full max-w-4xl mx-auto px-4 mb-8">
+          <div className="bg-white border-2 border-[#A53860] rounded-xl p-6 sm:p-8 shadow-lg">
+            {/* Title */}
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#A53860] mb-8 text-center">
+              AI Analysis of @{userData.username}
+            </h2>
+            
+            {/* Final Verdict - Centered and Prominent */}
+            <div className="text-center mb-10">
+              <div className="inline-block bg-[#EF88AD] border-2 border-[#670D2F] rounded-xl px-8 py-5 shadow-md">
+                <p className="text-sm text-[#670D2F] font-bold mb-2">FINAL VERDICT</p>
+                <p className="text-3xl sm:text-4xl font-bold text-black">
+                  {userData.quadrant?.toUpperCase().replace('-', ' ')}
+                </p>
+              </div>
+            </div>
+            
+            {/* Behavior Analysis - FIXED GRID LAYOUT */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+              {/* Desperate */}
+              <div className="bg-pink-50 border-2 border-pink-200 rounded-xl p-5 text-center shadow-sm hover:shadow-md transition-shadow">
+                <div className="text-sm font-bold text-pink-600 mb-3 uppercase tracking-wide">Desperate</div>
+                <div className="text-4xl font-bold text-pink-700 mb-3">{userData.percentages.desperate}%</div>
+                <div className="text-sm text-pink-600 font-medium mb-4">
+                  {userData.percentages.desperate >= 70 ? 'Very High' : 
+                   userData.percentages.desperate >= 50 ? 'High' : 
+                   userData.percentages.desperate >= 30 ? 'Moderate' : 'Low'}
+                </div>
+                <div className="w-full bg-pink-200 rounded-full h-3">
+                  <div 
+                    className="bg-pink-500 h-3 rounded-full transition-all duration-1000" 
+                    style={{width: `${userData.percentages.desperate}%`}}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Performative */}
+              <div className="bg-gray-50 border-2 border-gray-200 rounded-xl p-5 text-center shadow-sm hover:shadow-md transition-shadow">
+                <div className="text-sm font-bold text-gray-700 mb-3 uppercase tracking-wide">Performative</div>
+                <div className="text-4xl font-bold text-gray-700 mb-3">{userData.percentages.performative}%</div>
+                <div className="text-sm text-gray-600 font-medium mb-4">
+                  {userData.percentages.performative >= 70 ? 'Very High' : 
+                   userData.percentages.performative >= 50 ? 'High' : 
+                   userData.percentages.performative >= 30 ? 'Moderate' : 'Low'}
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div 
+                    className="bg-gray-600 h-3 rounded-full transition-all duration-1000" 
+                    style={{width: `${userData.percentages.performative}%`}}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Cry For Help */}
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-5 text-center shadow-sm hover:shadow-md transition-shadow">
+                <div className="text-sm font-bold text-blue-600 mb-3 uppercase tracking-wide">Cry For Help</div>
+                <div className="text-4xl font-bold text-blue-700 mb-3">{userData.percentages.cry_for_help}%</div>
+                <div className="text-sm text-blue-600 font-medium mb-4">
+                  {userData.percentages.cry_for_help >= 70 ? 'Very High' : 
+                   userData.percentages.cry_for_help >= 50 ? 'High' : 
+                   userData.percentages.cry_for_help >= 30 ? 'Moderate' : 'Low'}
+                </div>
+                <div className="w-full bg-blue-200 rounded-full h-3">
+                  <div 
+                    className="bg-blue-500 h-3 rounded-full transition-all duration-1000" 
+                    style={{width: `${userData.percentages.cry_for_help}%`}}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Ragebaiter */}
+              <div className="bg-green-50 border-2 border-green-200 rounded-xl p-5 text-center shadow-sm hover:shadow-md transition-shadow">
+                <div className="text-sm font-bold text-green-600 mb-3 uppercase tracking-wide">Ragebaiter</div>
+                <div className="text-4xl font-bold text-green-700 mb-3">{userData.percentages.ragebaiter}%</div>
+                <div className="text-sm text-green-600 font-medium mb-4">
+                  {userData.percentages.ragebaiter >= 70 ? 'Very High' : 
+                   userData.percentages.ragebaiter >= 50 ? 'High' : 
+                   userData.percentages.ragebaiter >= 30 ? 'Moderate' : 'Low'}
+                </div>
+                <div className="w-full bg-green-200 rounded-full h-3">
+                  <div 
+                    className="bg-green-500 h-3 rounded-full transition-all duration-1000" 
+                    style={{width: `${userData.percentages.ragebaiter}%`}}
+                  ></div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Analysis Text - Better Formatted */}
+            <div className="bg-gray-50 border-2 border-gray-200 rounded-xl p-6 mb-8">
+              <h3 className="text-lg font-bold text-gray-800 mb-4">Detailed Analysis</h3>
+              <p className="text-base text-gray-700 leading-relaxed font-medium">
+                {userData.analysis}
+              </p>
+            </div>
+            
+            {/* Confidence Score - Bottom Center */}
+            <div className="text-center">
+              <div className="inline-block bg-[#EF88AD] border-2 border-[#670D2F] rounded-xl px-10 py-6 shadow-md">
+                <p className="text-sm text-[#670D2F] font-bold mb-3 uppercase tracking-wide">AI Confidence</p>
+                <p className="text-4xl font-bold text-black">
+                  {(userData.confidence * 100).toFixed(0)}%
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Footer with Credits and Legal Info */}
+      <div className="w-full max-w-4xl mx-auto px-4 mb-8">
+        <div className="bg-white/80 backdrop-blur-sm border-2 border-[#A53860] rounded-xl p-6 shadow-lg">
+          <div className="text-center mb-6">
+            <h3 className="text-xl font-bold text-[#A53860] mb-4">How This Analysis Works</h3>
+            <p className="text-gray-700 text-sm leading-relaxed mb-4">
+              This tool analyzes publicly available Twitter content using AI to assess personality traits across four dimensions: 
+              <strong>Desperate</strong> (attention-seeking), <strong>Performative</strong> (authenticity), 
+              <strong>Cry for Help</strong> (support-seeking), and <strong>Ragebaiter</strong> (controversy-provoking). 
+              Results are based on content patterns and should be taken as entertainment only.
+            </p>
+          </div>
+          
+          <div className="border-t border-[#A53860]/30 pt-6">
+            <div className="text-center mb-4">
+              <p className="text-sm text-gray-600 mb-2">Made with ❤️ by</p>
+              <div className="flex justify-center items-center gap-4 text-sm">
+                <a 
+                  href="https://x.com/combif1am" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-[#A53860] hover:text-[#670D2F] font-bold transition-colors"
+                >
+                  @combif1am
+                </a>
+                <span className="text-gray-400">&</span>
+                <a 
+                  href="https://x.com/lowkeyverybored" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-[#A53860] hover:text-[#670D2F] font-bold transition-colors"
+                >
+                  @lowkeyverybored
+                </a>
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <p className="text-xs text-gray-500 leading-relaxed">
+                <strong>Disclaimer:</strong> This tool is for entertainment purposes only. Analysis results are AI-generated interpretations 
+                and should not be considered as professional psychological assessment. We do not store or collect personal data. 
+                All analysis is performed on publicly available content through legitimate API services. 
+                Use responsibly and respect others&apos; privacy.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
