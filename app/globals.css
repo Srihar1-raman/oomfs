@@ -1,8 +1,26 @@
-@import url('https://fonts.googleapis.com/css?family=Comic+Sans+MS:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Comic+Sans+MS:wght@400;700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+
+@font-face {
+  font-family: 'Comic Sans MS';
+  src: url('https://fonts.gstatic.com/s/comicsansms/v1/4UaDrEJFqYhaShnGvWF9Bg.woff2') format('woff2'),
+       url('https://fonts.gstatic.com/s/comicsansms/v1/4UaDrEJFqYhaShnGvWF9Bg.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Comic Sans MS';
+  src: url('https://fonts.gstatic.com/s/comicsansms/v1/4UaDrEJFqYhaShnGvWF9Bg.woff2') format('woff2'),
+       url('https://fonts.gstatic.com/s/comicsansms/v1/4UaDrEJFqYhaShnGvWF9Bg.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 @theme inline {
   --color-background: var(--background);
@@ -128,6 +146,7 @@
 
 @layer utilities {
   .font-comic {
-    font-family: 'Comic Sans MS', cursive;
+    font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', 'Chalkboard', 'Comic Neue', 'Marker Felt', 'Arial Rounded MT Bold', 'Arial Rounded MT', 'Arial', sans-serif;
+    font-display: swap;
   }
 }
