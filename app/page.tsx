@@ -224,12 +224,12 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#EF88AD] text-black p-6 font-comic">
       {/* Header */}
-        <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-6xl font-bold mb-4">
+        <div className="text-center mb-8 sm:mb-12">
+        <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-3 sm:mb-4">
           <span className="text-white">oomf-</span>
           <span className="text-white">analyzer</span>
         </h1>
-        <p className="text-[#670D2F] text-lg font-medium">
+        <p className="text-[#670D2F] text-base sm:text-lg font-medium">
           discover your twitter personality type
         </p>
       </div>
@@ -266,14 +266,14 @@ export default function Home() {
                 </span>
               </div>
               {userData?.quadrant === 'desperate' && !isAnalyzing && (
-                <div className="absolute inset-0 flex items-center justify-center z-10">
+                <div className="absolute inset-0 flex items-center justify-center z-30">
                   <div className="text-center">
                     <img
                       src="/apple-fun.jpg"
                       alt={userData.username}
                       className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-3 sm:border-4 border-[#A53860] shadow-xl ring-2 sm:ring-4 ring-[#EF88AD] object-cover"
                     />
-                    <div className="mt-2 text-xs sm:text-sm font-bold text-[#A53860] bg-white/90 px-2 py-1 rounded-full border border-[#A53860]/30">
+                    <div className="mt-2 text-xs sm:text-sm font-bold text-[#A53860] bg-white/95 px-2 py-1 rounded-full border border-[#A53860]/30 shadow-sm">
                       @{userData.username}
                     </div>
                   </div>
@@ -290,14 +290,14 @@ export default function Home() {
                 </span>
               </div>
               {userData?.quadrant === 'performative' && !isAnalyzing && (
-                <div className="absolute inset-0 flex items-center justify-center z-10">
+                <div className="absolute inset-0 flex items-center justify-center z-30">
                   <div className="text-center">
                     <img
                       src="/apple-fun.jpg"
                       alt={userData.username}
                       className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-3 sm:border-4 border-[#A53860] shadow-xl ring-2 sm:ring-4 ring-[#EF88AD] object-cover"
                     />
-                    <div className="mt-2 text-xs sm:text-sm font-bold text-[#A53860] bg-white/90 px-2 py-1 rounded-full border border-[#A53860]/30">
+                    <div className="mt-2 text-xs sm:text-sm font-bold text-[#A53860] bg-white/95 px-2 py-1 rounded-full border border-[#A53860]/30 shadow-sm">
                       @{userData.username}
                     </div>
                   </div>
@@ -314,14 +314,14 @@ export default function Home() {
                 </span>
               </div>
               {userData?.quadrant === 'cry-for-help' && !isAnalyzing && (
-                <div className="absolute inset-0 flex items-center justify-center z-10">
+                <div className="absolute inset-0 flex items-center justify-center z-30">
                   <div className="text-center">
                     <img
                       src="/apple-fun.jpg"
                       alt={userData.username}
                       className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-3 sm:border-4 border-blue-500 shadow-xl ring-2 sm:ring-4 ring-blue-200 object-cover"
                     />
-                    <div className="mt-2 text-xs sm:text-sm font-bold text-blue-600 bg-white/90 px-2 py-1 rounded-full border border-blue-500/30">
+                    <div className="mt-2 text-xs sm:text-sm font-bold text-blue-600 bg-white/95 px-2 py-1 rounded-full border border-blue-500/30 shadow-sm">
                       @{userData.username}
                     </div>
                   </div>
@@ -338,14 +338,14 @@ export default function Home() {
                 </span>
               </div>
               {userData?.quadrant === 'ragebaiter' && !isAnalyzing && (
-                <div className="absolute inset-0 flex items-center justify-center z-10">
+                <div className="absolute inset-0 flex items-center justify-center z-30">
                   <div className="text-center">
                     <img
                       src="/apple-fun.jpg"
                       alt={userData.username}
                       className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-3 sm:border-4 border-green-500 shadow-xl ring-2 sm:ring-4 ring-green-200 object-cover"
                     />
-                    <div className="mt-2 text-xs sm:text-sm font-bold text-green-600 bg-white/90 px-2 py-1 rounded-full border border-green-500/30">
+                    <div className="mt-2 text-xs sm:text-sm font-bold text-green-600 bg-white/95 px-2 py-1 rounded-full border border-green-500/30 shadow-sm">
                       @{userData.username}
                     </div>
                   </div>
@@ -356,9 +356,9 @@ export default function Home() {
         </div>
 
         {/* Username Input - Under the Chart */}
-        <div className="text-center px-4 mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold mb-6 text-black">personality analyzer</h2>
-          <p className="text-gray-800 mb-6 text-sm sm:text-base font-medium">enter your username and discover your twitter behavior type</p>
+        <div className="text-center px-4 mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-6 text-black">personality analyzer</h2>
+          <p className="text-gray-800 mb-4 sm:mb-6 text-sm sm:text-base font-medium">enter your username and discover your twitter behavior type</p>
           
           <div className="max-w-md mx-auto space-y-5">
             <input
@@ -431,26 +431,26 @@ export default function Home() {
         <div className="w-full max-w-4xl mx-auto px-4 mb-8">
           <div className="bg-white border-2 border-[#A53860] rounded-xl p-6 sm:p-8 shadow-lg">
             {/* Title */}
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#A53860] mb-8 text-center">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#A53860] mb-6 sm:mb-8 text-center">
               AI Analysis of @{userData.username}
             </h2>
             
             {/* Final Verdict - Centered and Prominent */}
-            <div className="text-center mb-10">
-              <div className="inline-block bg-[#EF88AD] border-2 border-[#670D2F] rounded-xl px-8 py-5 shadow-md">
-                <p className="text-sm text-[#670D2F] font-bold mb-2">FINAL VERDICT</p>
-                <p className="text-3xl sm:text-4xl font-bold text-black">
+            <div className="text-center mb-8 sm:mb-10">
+              <div className="inline-block bg-[#EF88AD] border-2 border-[#670D2F] rounded-xl px-6 sm:px-8 py-4 sm:py-5 shadow-md">
+                <p className="text-xs sm:text-sm text-[#670D2F] font-bold mb-1 sm:mb-2">FINAL VERDICT</p>
+                <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-black">
                   {userData.quadrant?.toUpperCase().replace('-', ' ')}
                 </p>
               </div>
             </div>
             
             {/* Behavior Analysis - FIXED GRID LAYOUT */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-10">
               {/* Desperate */}
-              <div className="bg-pink-50 border-2 border-pink-200 rounded-xl p-5 text-center shadow-sm hover:shadow-md transition-shadow">
-                <div className="text-sm font-bold text-pink-600 mb-3 uppercase tracking-wide">Desperate</div>
-                <div className="text-4xl font-bold text-pink-700 mb-3">{userData.percentages.desperate}%</div>
+              <div className="bg-pink-50 border-2 border-pink-200 rounded-xl p-4 sm:p-5 text-center shadow-sm hover:shadow-md transition-shadow">
+                <div className="text-xs sm:text-sm font-bold text-pink-600 mb-2 sm:mb-3 uppercase tracking-wide">Desperate</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-pink-700 mb-2 sm:mb-3">{userData.percentages.desperate}%</div>
                 <div className="text-sm text-pink-600 font-medium mb-4">
                   {userData.percentages.desperate >= 70 ? 'Very High' : 
                    userData.percentages.desperate >= 50 ? 'High' : 
@@ -465,9 +465,9 @@ export default function Home() {
               </div>
 
               {/* Performative */}
-              <div className="bg-gray-50 border-2 border-gray-200 rounded-xl p-5 text-center shadow-sm hover:shadow-md transition-shadow">
-                <div className="text-sm font-bold text-gray-700 mb-3 uppercase tracking-wide">Performative</div>
-                <div className="text-4xl font-bold text-gray-700 mb-3">{userData.percentages.performative}%</div>
+              <div className="bg-gray-50 border-2 border-gray-200 rounded-xl p-4 sm:p-5 text-center shadow-sm hover:shadow-md transition-shadow">
+                <div className="text-xs sm:text-sm font-bold text-gray-700 mb-2 sm:mb-3 uppercase tracking-wide">Performative</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-700 mb-2 sm:mb-3">{userData.percentages.performative}%</div>
                 <div className="text-sm text-gray-600 font-medium mb-4">
                   {userData.percentages.performative >= 70 ? 'Very High' : 
                    userData.percentages.performative >= 50 ? 'High' : 
@@ -482,9 +482,9 @@ export default function Home() {
                   </div>
 
               {/* Cry For Help */}
-              <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-5 text-center shadow-sm hover:shadow-md transition-shadow">
-                <div className="text-sm font-bold text-blue-600 mb-3 uppercase tracking-wide">Cry For Help</div>
-                <div className="text-4xl font-bold text-blue-700 mb-3">{userData.percentages.cry_for_help}%</div>
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 sm:p-5 text-center shadow-sm hover:shadow-md transition-shadow">
+                <div className="text-xs sm:text-sm font-bold text-blue-600 mb-2 sm:mb-3 uppercase tracking-wide">Cry For Help</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-700 mb-2 sm:mb-3">{userData.percentages.cry_for_help}%</div>
                 <div className="text-sm text-blue-600 font-medium mb-4">
                   {userData.percentages.cry_for_help >= 70 ? 'Very High' : 
                    userData.percentages.cry_for_help >= 50 ? 'High' : 
@@ -499,9 +499,9 @@ export default function Home() {
               </div>
 
               {/* Ragebaiter */}
-              <div className="bg-green-50 border-2 border-green-200 rounded-xl p-5 text-center shadow-sm hover:shadow-md transition-shadow">
-                <div className="text-sm font-bold text-green-600 mb-3 uppercase tracking-wide">Ragebaiter</div>
-                <div className="text-4xl font-bold text-green-700 mb-3">{userData.percentages.ragebaiter}%</div>
+              <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4 sm:p-5 text-center shadow-sm hover:shadow-md transition-shadow">
+                <div className="text-xs sm:text-sm font-bold text-green-600 mb-2 sm:mb-3 uppercase tracking-wide">Ragebaiter</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-green-700 mb-2 sm:mb-3">{userData.percentages.ragebaiter}%</div>
                 <div className="text-sm text-green-600 font-medium mb-4">
                   {userData.percentages.ragebaiter >= 70 ? 'Very High' : 
                    userData.percentages.ragebaiter >= 50 ? 'High' : 
