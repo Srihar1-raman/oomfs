@@ -1,0 +1,47 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        // Force hex colors instead of oklch
+        background: '#ffffff',
+        foreground: '#0a0a0a',
+        card: '#ffffff',
+        'card-foreground': '#0a0a0a',
+        popover: '#ffffff',
+        'popover-foreground': '#0a0a0a',
+        primary: '#171717',
+        'primary-foreground': '#fafafa',
+        secondary: '#f5f5f5',
+        'secondary-foreground': '#171717',
+        muted: '#f5f5f5',
+        'muted-foreground': '#737373',
+        accent: '#f5f5f5',
+        'accent-foreground': '#171717',
+        destructive: '#dc2626',
+        border: '#e5e5e5',
+        input: '#e5e5e5',
+        ring: '#a3a3a3',
+        'chart-1': '#f97316',
+        'chart-2': '#06b6d4',
+        'chart-3': '#3b82f6',
+        'chart-4': '#84cc16',
+        'chart-5': '#eab308',
+        sidebar: '#fafafa',
+        'sidebar-foreground': '#0a0a0a',
+        'sidebar-primary': '#171717',
+        'sidebar-primary-foreground': '#fafafa',
+        'sidebar-accent': '#f5f5f5',
+        'sidebar-accent-foreground': '#171717',
+        'sidebar-border': '#e5e5e5',
+        'sidebar-ring': '#a3a3a3',
+      },
+    },
+  },
+  plugins: [],
+}

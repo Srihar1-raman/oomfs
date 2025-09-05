@@ -8,7 +8,7 @@ A fun Twitter personality analyzer that places users on a 4-dimensional "Chaos G
 - 🤖 **AI-Powered Analysis**: Uses Groq AI and Tavily search for intelligent Twitter content analysis
 - 🎨 **Beautiful UI**: Modern, responsive design with smooth animations and visual feedback
 - 📱 **Mobile Friendly**: Works perfectly on all devices
-- 📋 **Chart Export**: Copy your personality chart to clipboard as PNG
+- 📥 **Chart Export**: Download your personality chart as PNG image
 
 ## Credits
 
@@ -50,7 +50,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 2. **Search**: The app searches for the user's Twitter content using Tavily
 3. **Analysis**: Groq AI analyzes the content and assigns scores across 4 dimensions
 4. **Visualization**: Results are displayed on an interactive quadrant grid
-5. **Export**: Copy your personality chart to share with friends!
+5. **Export**: Download your personality chart to share with friends!
 
 ## Personality Dimensions
 

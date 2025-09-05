@@ -36,8 +36,9 @@ export default function Home() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [profilePosition, setProfilePosition] = useState({ x: 50, y: 50 });
-  const [isCopying, setIsCopying] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const chartRef = useRef<HTMLDivElement>(null);
+  const downloadAreaRef = useRef<HTMLDivElement>(null);
 
   // Roaming animation during analysis - Move through all quadrants
   useEffect(() => {
@@ -103,52 +104,53 @@ export default function Home() {
     return quadrantPosition;
   };
 
-  // Copy chart to clipboard as PNG
-  const copyChartToClipboard = async () => {
-    if (!chartRef.current || !userData) return;
+  // Download chart as PNG image
+  const downloadChart = async () => {
+    if (!downloadAreaRef.current || !userData) return;
     
-    setIsCopying(true);
+    setIsDownloading(true);
     
     try {
-      // Use html2canvas to capture the chart
+      // Dynamic import of html2canvas
       const html2canvas = (await import('html2canvas')).default;
-      const canvas = await html2canvas(chartRef.current, {
-        backgroundColor: 'white',
-        scale: 2, // Higher quality
+      
+      // Create a clean canvas with optimized settings
+      const canvas = await html2canvas(downloadAreaRef.current, {
+        background: '#EF88AD', // Match the page background
         useCORS: true,
-        allowTaint: true
+        allowTaint: true,
+        logging: false
       });
       
-      // Convert to blob
-      canvas.toBlob(async (blob: Blob | null) => {
+      // Convert canvas to blob and download
+      canvas.toBlob((blob: Blob | null) => {
         if (blob) {
-          try {
-            // Copy to clipboard
-            await navigator.clipboard.write([
-              new ClipboardItem({
-                'image/png': blob
-              })
-            ]);
-            
-            // Show success message
-            alert('Chart copied to clipboard! 🎉');
-          } catch (err) {
-            // Fallback: download the image
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${userData.username}-wojak-chart.png`;
-            a.click();
-            URL.revokeObjectURL(url);
-            alert('Chart downloaded as PNG! 📥');
-          }
+          // Create download link
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `${userData.username}-personality-chart.png`;
+          
+          // Trigger download
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          // Clean up
+          URL.revokeObjectURL(url);
+          
+          // Success feedback
+          alert('Chart downloaded successfully! 📥');
+        } else {
+          throw new Error('Failed to create image blob');
         }
-      }, 'image/png');
+      }, 'image/png', 0.95); // High quality PNG
+      
     } catch (error) {
-      console.error('Error copying chart:', error);
-      alert('Failed to copy chart. Please try again.');
+      console.error('Download error:', error);
+      alert('Failed to download chart. Please try again.');
     } finally {
-      setIsCopying(false);
+      setIsDownloading(false);
     }
   };
 
@@ -223,19 +225,21 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#EF88AD] text-black p-6 font-comic">
-      {/* Header */}
+      {/* Download Area - includes header and main content */}
+      <div ref={downloadAreaRef} className="bg-[#EF88AD] p-6">
+        {/* Header */}
         <div className="text-center mb-8 sm:mb-12">
-        <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-3 sm:mb-4">
-          <span className="text-white">oomf-</span>
-          <span className="text-white">analyzer</span>
-        </h1>
-        <p className="text-[#670D2F] text-base sm:text-lg font-medium">
-          discover your twitter personality type
-        </p>
-      </div>
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-3 sm:mb-4">
+            <span className="text-white">oomf-</span>
+            <span className="text-white">analyzer</span>
+          </h1>
+          <p className="text-[#670D2F] text-base sm:text-lg font-medium">
+            discover your twitter personality type
+          </p>
+        </div>
 
-      {/* Main Content Area */}
-      <div className="w-full max-w-sm sm:max-w-md md:max-w-lg mx-auto mb-8 px-4">
+        {/* Main Content Area */}
+        <div className="w-full max-w-sm sm:max-w-md md:max-w-lg mx-auto mb-8 px-4">
         {/* Quadrant Grid - FIXED POSITIONING */}
         <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 shadow-lg mb-4 relative overflow-visible" ref={chartRef}>
           {/* Grid Background */}
@@ -260,8 +264,8 @@ export default function Home() {
             {/* Desperate - Top Left */}
             <div className="bg-gradient-to-br from-pink-100/60 to-pink-200/40 border-r border-b border-gray-300/50 relative flex items-center justify-center group hover:from-pink-200/80 hover:to-pink-300/60 transition-all duration-300">
               <div className="absolute inset-0 bg-pink-500/5"></div>
-              <div className="absolute top-3 left-1/2 transform -translate-x-1/2 z-20">
-                <span className="text-xs sm:text-sm font-bold text-pink-600 bg-pink-50/90 px-3 py-1 rounded-full border border-pink-300 shadow-sm">
+              <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-20">
+                <span className="text-xs sm:text-sm font-bold text-pink-600 bg-pink-50/90 px-2 py-1 rounded-full border border-pink-300 shadow-sm">
                   Desperate
                 </span>
               </div>
@@ -271,9 +275,9 @@ export default function Home() {
                     <img
                       src="/apple-fun.jpg"
                       alt={userData.username}
-                      className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-3 sm:border-4 border-[#A53860] shadow-xl ring-2 sm:ring-4 ring-[#EF88AD] object-cover"
+                      className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full border-2 sm:border-3 border-[#A53860] shadow-lg ring-1 sm:ring-2 ring-[#EF88AD] object-cover mx-auto"
                     />
-                    <div className="mt-2 text-xs sm:text-sm font-bold text-[#A53860] bg-white/95 px-2 py-1 rounded-full border border-[#A53860]/30 shadow-sm">
+                    <div className="mt-1 text-xs font-bold text-[#A53860] bg-white/95 px-2 py-0.5 rounded-full border border-[#A53860]/30 shadow-sm">
                       @{userData.username}
                     </div>
                   </div>
@@ -284,8 +288,8 @@ export default function Home() {
             {/* Performative - Top Right */}
             <div className="bg-gradient-to-bl from-gray-100/60 to-gray-200/40 border-l border-b border-gray-300/50 relative flex items-center justify-center group hover:from-gray-200/80 hover:to-gray-300/60 transition-all duration-300">
               <div className="absolute inset-0 bg-gray-600/5"></div>
-              <div className="absolute top-3 left-1/2 transform -translate-x-1/2 z-20">
-                <span className="text-xs sm:text-sm font-bold text-gray-800 bg-gray-100/90 px-3 py-1 rounded-full border border-gray-400 shadow-sm">
+              <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-20">
+                <span className="text-xs sm:text-sm font-bold text-gray-800 bg-gray-100/90 px-2 py-1 rounded-full border border-gray-400 shadow-sm">
                   Performative
                 </span>
               </div>
@@ -295,9 +299,9 @@ export default function Home() {
                     <img
                       src="/apple-fun.jpg"
                       alt={userData.username}
-                      className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-3 sm:border-4 border-[#A53860] shadow-xl ring-2 sm:ring-4 ring-[#EF88AD] object-cover"
+                      className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full border-2 sm:border-3 border-[#A53860] shadow-lg ring-1 sm:ring-2 ring-[#EF88AD] object-cover mx-auto"
                     />
-                    <div className="mt-2 text-xs sm:text-sm font-bold text-[#A53860] bg-white/95 px-2 py-1 rounded-full border border-[#A53860]/30 shadow-sm">
+                    <div className="mt-1 text-xs font-bold text-[#A53860] bg-white/95 px-2 py-0.5 rounded-full border border-[#A53860]/30 shadow-sm">
                       @{userData.username}
                     </div>
                   </div>
@@ -308,8 +312,8 @@ export default function Home() {
             {/* Cry for Help - Bottom Left */}
             <div className="bg-gradient-to-tr from-blue-100/60 to-blue-200/40 border-r border-t border-gray-300/50 relative flex items-center justify-center group hover:from-blue-200/80 hover:to-blue-300/60 transition-all duration-300">
               <div className="absolute inset-0 bg-blue-500/5"></div>
-              <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 z-20">
-                <span className="text-xs sm:text-sm font-bold text-blue-600 bg-blue-50/90 px-3 py-1 rounded-full border border-blue-300 shadow-sm whitespace-nowrap">
+              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 z-20">
+                <span className="text-xs sm:text-sm font-bold text-blue-600 bg-blue-50/90 px-2 py-1 rounded-full border border-blue-300 shadow-sm whitespace-nowrap">
                   Cry For Help
                 </span>
               </div>
@@ -319,9 +323,9 @@ export default function Home() {
                     <img
                       src="/apple-fun.jpg"
                       alt={userData.username}
-                      className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-3 sm:border-4 border-blue-500 shadow-xl ring-2 sm:ring-4 ring-blue-200 object-cover"
+                      className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full border-2 sm:border-3 border-blue-500 shadow-lg ring-1 sm:ring-2 ring-blue-200 object-cover mx-auto"
                     />
-                    <div className="mt-2 text-xs sm:text-sm font-bold text-blue-600 bg-white/95 px-2 py-1 rounded-full border border-blue-500/30 shadow-sm">
+                    <div className="mt-1 text-xs font-bold text-blue-600 bg-white/95 px-2 py-0.5 rounded-full border border-blue-500/30 shadow-sm">
                       @{userData.username}
                     </div>
                   </div>
@@ -332,8 +336,8 @@ export default function Home() {
             {/* Ragebaiter - Bottom Right */}
             <div className="bg-gradient-to-tl from-green-100/60 to-green-200/40 border-l border-t border-gray-300/50 relative flex items-center justify-center group hover:from-green-200/80 hover:to-green-300/60 transition-all duration-300">
               <div className="absolute inset-0 bg-green-500/5"></div>
-              <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 z-20">
-                <span className="text-xs sm:text-sm font-bold text-green-600 bg-green-50/90 px-3 py-1 rounded-full border border-green-300 shadow-sm">
+              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 z-20">
+                <span className="text-xs sm:text-sm font-bold text-green-600 bg-green-50/90 px-2 py-1 rounded-full border border-green-300 shadow-sm">
                   Ragebaiter
                 </span>
               </div>
@@ -343,9 +347,9 @@ export default function Home() {
                     <img
                       src="/apple-fun.jpg"
                       alt={userData.username}
-                      className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-3 sm:border-4 border-green-500 shadow-xl ring-2 sm:ring-4 ring-green-200 object-cover"
+                      className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full border-2 sm:border-3 border-green-500 shadow-lg ring-1 sm:ring-2 ring-green-200 object-cover mx-auto"
                     />
-                    <div className="mt-2 text-xs sm:text-sm font-bold text-green-600 bg-white/95 px-2 py-1 rounded-full border border-green-500/30 shadow-sm">
+                    <div className="mt-1 text-xs font-bold text-green-600 bg-white/95 px-2 py-0.5 rounded-full border border-green-500/30 shadow-sm">
                       @{userData.username}
                     </div>
                   </div>
@@ -381,20 +385,21 @@ export default function Home() {
             </button>
           </div>
         </div>
+        </div>
       </div>
 
-      {/* Copy Chart Button - Only show when results are available */}
+      {/* Download Chart Button - Only show when results are available */}
       {userData && (
         <div className="w-full max-w-sm sm:max-w-md md:max-w-lg mx-auto mb-8 text-center px-4">
           <button
-            onClick={copyChartToClipboard}
-            disabled={isCopying}
+            onClick={downloadChart}
+            disabled={isDownloading}
             className="bg-[#670D2F] hover:bg-[#3A0519] text-white text-base lg:text-lg px-8 py-4 rounded-lg font-comic border-2 border-[#670D2F] hover:border-[#3A0519] transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-bold"
           >
-            {isCopying ? 'copying...' : '📋 copy chart to clipboard'}
+            {isDownloading ? 'downloading...' : '📥 download chart as image'}
           </button>
           <p className="text-gray-800 text-xs sm:text-sm mt-3 font-medium">
-            Copy your personality chart with profile picture as a PNG image
+            Download your personality chart with profile picture as a PNG image
           </p>
         </div>
       )}
