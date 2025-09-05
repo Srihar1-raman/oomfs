@@ -113,14 +113,40 @@ export default function Home() {
     try {
       // Dynamic import of html2canvas
       const html2canvas = (await import('html2canvas')).default;
-      
-      // Create a clean canvas with optimized settings
+
+      // Brief delay to ensure DOM is ready
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Debug: Ensure the final verdict element is visible and rendered
+      const finalVerdictElement = downloadAreaRef.current.querySelector('.final-verdict-container');
+      if (finalVerdictElement) {
+        finalVerdictElement.style.display = 'block';
+        finalVerdictElement.style.visibility = 'visible';
+        console.log('Final verdict element found:', finalVerdictElement);
+        console.log('Final verdict text content:', finalVerdictElement.textContent);
+      } else {
+        console.log('Final verdict element NOT found');
+      }
+
+      // Create canvas with settings optimized for both text and images
       const canvas = await html2canvas(downloadAreaRef.current, {
-        background: '#EF88AD', // Match the page background
+        backgroundColor: '#EF88AD',
         useCORS: true,
         allowTaint: true,
-        logging: false
+        scale: 2,
+        logging: false,
+        imageTimeout: 0,
+        removeContainer: false,
+        foreignObjectRendering: false,
+        // Additional settings for better text rendering
+        letterRendering: true,
+        // Ensure proper canvas sizing
+        windowWidth: window.innerWidth,
+        windowHeight: window.innerHeight,
       });
+
+      // Debug: Check if canvas was created with content
+      console.log('Canvas created:', canvas.width, 'x', canvas.height);
       
       // Convert canvas to blob and download
       canvas.toBlob((blob: Blob | null) => {
@@ -237,6 +263,23 @@ export default function Home() {
             discover your twitter personality type
           </p>
         </div>
+
+        {/* Final Verdict - Show after analysis */}
+        {userData && (
+          <div className="text-center mb-4 sm:mb-6 final-verdict-container">
+            <div className="inline-block bg-white border-2 border-[#670D2F] rounded-lg px-4 sm:px-6 py-2 sm:py-3 shadow-lg"
+                 style={{ backgroundColor: 'white', border: '2px solid #670D2F', minHeight: '60px', position: 'relative', zIndex: 1 }}>
+              <p className="text-xs text-[#670D2F] font-bold mb-1"
+                 style={{ color: '#670D2F', fontWeight: 'bold', fontSize: '12px' }}>
+                FINAL VERDICT
+              </p>
+              <p className="text-lg sm:text-xl md:text-2xl font-bold text-black"
+                 style={{ color: 'black', fontWeight: 'bold', fontSize: '18px' }}>
+                {userData.quadrant?.toUpperCase().replace('-', ' ')}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Main Content Area */}
         <div className="w-full max-w-sm sm:max-w-md md:max-w-lg mx-auto mb-8 px-4">

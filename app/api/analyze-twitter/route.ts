@@ -30,7 +30,9 @@ export async function POST(req: Request) {
         }
 
         // Fetch Twitter data using Tavily search (like in the image)
+        console.log(`\n🔍 ===== STARTING ANALYSIS FOR @${username} =====`)
         console.log(`🔍 Searching Twitter data for username: ${username}`)
+        console.log(`⏰ Timestamp: ${new Date().toISOString()}`)
         
         const searchResult = await tavilyClient.search(
             `${username} twitter`,
@@ -45,8 +47,18 @@ export async function POST(req: Request) {
             }
         )
 
-        console.log('📊 Tavily Search Response:', JSON.stringify(searchResult, null, 2))
+        console.log('\n📊 ===== TAVILY SEARCH RESULTS =====')
         console.log('📝 Number of results:', searchResult.results?.length || 0)
+        
+        // Log each result individually for better visibility
+        if (searchResult.results) {
+            searchResult.results.forEach((result, index) => {
+                console.log(`\n📄 Result ${index + 1}:`)
+                console.log(`   URL: ${result.url}`)
+                console.log(`   Title: ${result.title}`)
+                console.log(`   Content Preview: ${result.content?.substring(0, 200)}...`)
+            })
+        }
 
         if (!searchResult.results || searchResult.results.length === 0) {
             console.log('❌ No results found from Tavily search')
@@ -149,7 +161,11 @@ export async function POST(req: Request) {
         User's Twitter data to analyze:
         ${twitterContent}`
 
+        console.log('\n🤖 ===== SENDING TO GROQ AI =====')
         console.log('🤖 Sending to Groq AI...')
+        console.log(`🤖 Model: openai/gpt-oss-120b`)
+        console.log(`🤖 Temperature: 0.3`)
+        
         const response = await generateText({
             model: enhancedModel,
             system,
@@ -159,22 +175,40 @@ export async function POST(req: Request) {
             temperature: 0.3,
         })
 
-        console.log('✅ Groq AI Response:', response.text)
+        console.log('\n✅ ===== GROQ AI RESPONSE =====')
+        console.log('✅ Full AI Response:')
+        console.log(response.text)
+        console.log('\n📊 Response Stats:')
+        console.log(`   - Text Length: ${response.text.length} characters`)
+        console.log(`   - Finish Reason: ${response.finishReason}`)
+        console.log(`   - Usage: ${JSON.stringify(response.usage, null, 2)}`)
 
         // Parse the AI response to extract JSON
         let analysisResult
         try {
+            console.log('\n🔧 ===== PARSING AI RESPONSE =====')
             // Try to find JSON in the response
             const jsonMatch = response.text.match(/\{[\s\S]*\}/)
             if (jsonMatch) {
+                console.log('🔧 Found JSON in response, parsing...')
                 analysisResult = JSON.parse(jsonMatch[0])
+                console.log('✅ Successfully parsed JSON:')
+                console.log(JSON.stringify(analysisResult, null, 2))
             } else {
+                console.error('❌ No valid JSON found in response')
                 throw new Error('No valid JSON found in response')
             }
         } catch (parseError) {
-            console.error('Failed to parse AI response:', response.text)
+            console.error('❌ Failed to parse AI response:', parseError)
+            console.error('❌ Raw response text:', response.text)
             throw new Error('AI response parsing failed')
         }
+
+        console.log('\n🎉 ===== ANALYSIS COMPLETE =====')
+        console.log(`🎉 Successfully analyzed @${username}`)
+        console.log(`🎉 Final coordinates:`, analysisResult.coordinates)
+        console.log(`🎉 Confidence: ${analysisResult.confidence}`)
+        console.log(`🎉 ===== END ANALYSIS =====\n`)
 
         return new Response(JSON.stringify(analysisResult), {
             status: 200,
