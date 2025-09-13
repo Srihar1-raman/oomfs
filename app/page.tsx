@@ -117,36 +117,21 @@ export default function Home() {
       // Brief delay to ensure DOM is ready
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      // Debug: Ensure the final verdict element is visible and rendered
-      const finalVerdictElement = downloadAreaRef.current.querySelector('.final-verdict-container');
+      // Ensure the final verdict element is visible and rendered
+      const finalVerdictElement = downloadAreaRef.current.querySelector('.final-verdict-container') as HTMLElement;
       if (finalVerdictElement) {
         finalVerdictElement.style.display = 'block';
         finalVerdictElement.style.visibility = 'visible';
-        console.log('Final verdict element found:', finalVerdictElement);
-        console.log('Final verdict text content:', finalVerdictElement.textContent);
-      } else {
-        console.log('Final verdict element NOT found');
       }
 
       // Create canvas with settings optimized for both text and images
       const canvas = await html2canvas(downloadAreaRef.current, {
-        backgroundColor: '#EF88AD',
+        background: '#EF88AD',
         useCORS: true,
         allowTaint: true,
-        scale: 2,
         logging: false,
-        imageTimeout: 0,
-        removeContainer: false,
-        foreignObjectRendering: false,
-        // Additional settings for better text rendering
-        letterRendering: true,
-        // Ensure proper canvas sizing
-        windowWidth: window.innerWidth,
-        windowHeight: window.innerHeight,
       });
 
-      // Debug: Check if canvas was created with content
-      console.log('Canvas created:', canvas.width, 'x', canvas.height);
       
       // Convert canvas to blob and download
       canvas.toBlob((blob: Blob | null) => {
@@ -181,66 +166,69 @@ export default function Home() {
   };
 
   const analyzeUser = async () => {
-    if (!username) return;
+    if (!username.trim()) return;
     
     setIsAnalyzing(true);
     
-    // Simulate AI analysis delay
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    // Mock AI response with coordinates - in real app, this would come from your AI API
-    const mockAIResponse: AIResponse = {
-      coordinates: {
-        desperate: Math.random() * 2 - 1, // Random value between -1 and 1
-        performative: Math.random() * 2 - 1,
-        cry_for_help: Math.random() * 2 - 1,
-        ragebaiter: Math.random() * 2 - 1
-      },
-      confidence: 0.7 + Math.random() * 0.3, // Random confidence between 0.7 and 1.0
-      reasoning: "Based on tweet analysis, this user shows patterns of...",
-      key_indicators: ["frequent attention-seeking posts", "emotional outbursts", "controversial takes"]
-    };
-    
-    const mockProfilePicture = '/apple-fun.jpg';
-    
-    // Determine quadrant and position from AI coordinates
-    const quadrant = getQuadrantFromCoordinates(mockAIResponse.coordinates);
-    const position = getPositionFromCoordinates(mockAIResponse.coordinates);
-    
-    // Convert coordinates to percentages for better readability
-    const coordinatePercentages = {
-      desperate: Math.round(((mockAIResponse.coordinates.desperate + 1) / 2) * 100),
-      performative: Math.round(((mockAIResponse.coordinates.performative + 1) / 2) * 100),
-      cry_for_help: Math.round(((mockAIResponse.coordinates.cry_for_help + 1) / 2) * 100),
-      ragebaiter: Math.round(((mockAIResponse.coordinates.ragebaiter + 1) / 2) * 100)
-    };
+    try {
+      const response = await fetch('/api/analyze-twitter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: username.trim() }),
+      });
+      
+      // if (!response.ok) {
+      //   const errorData = await response.json();
+      //   throw new Error(errorData.error || 'Failed to analyze user');
+      // }
 
-    // Generate more intuitive analysis text
-    const getIntensityLevel = (percentage: number) => {
-      if (percentage >= 80) return 'extremely high';
-      if (percentage >= 60) return 'high';
-      if (percentage >= 40) return 'moderate';
-      if (percentage >= 20) return 'low';
-      return 'very low';
-    };
+      const aiResponse: AIResponse = await response.json();
+      
+      // Determine quadrant and position from AI coordinates
+      const quadrant = getQuadrantFromCoordinates(aiResponse.coordinates);
+      const position = getPositionFromCoordinates(aiResponse.coordinates);
+      
+      // Convert coordinates to percentages for better readability
+      const coordinatePercentages = {
+        desperate: Math.round(((aiResponse.coordinates.desperate + 1) / 2) * 100),
+        performative: Math.round(((aiResponse.coordinates.performative + 1) / 2) * 100),
+        cry_for_help: Math.round(((aiResponse.coordinates.cry_for_help + 1) / 2) * 100),
+        ragebaiter: Math.round(((aiResponse.coordinates.ragebaiter + 1) / 2) * 100)
+      };
 
-    const analysis = `Analysis shows this user is ${quadrant === 'desperate' ? 'desperately seeking validation and attention' : quadrant === 'performative' ? 'performing for an audience rather than being authentic' : quadrant === 'cry-for-help' ? 'expressing genuine distress and seeking support' : 'intentionally provoking reactions and controversy'}. Their behavior breakdown: ${coordinatePercentages.desperate}% desperate tendencies (${getIntensityLevel(coordinatePercentages.desperate)}), ${coordinatePercentages.performative}% performative behavior (${getIntensityLevel(coordinatePercentages.performative)}), ${coordinatePercentages.cry_for_help}% cry for help signals (${getIntensityLevel(coordinatePercentages.cry_for_help)}), and ${coordinatePercentages.ragebaiter}% rage-baiting content (${getIntensityLevel(coordinatePercentages.ragebaiter)}).`;
-    
-    setUserData({
-      username: username,
-      profilePicture: mockProfilePicture,
-      coordinates: mockAIResponse.coordinates,
-      percentages: coordinatePercentages,
-      quadrant: quadrant,
-      analysis: analysis,
-      confidence: mockAIResponse.confidence
-    });
-    
-    // Move profile picture to calculated position
-    setProfilePosition(position);
-    
-    setIsAnalyzing(false);
-    setUsername('');
+      // Generate analysis text
+      const getIntensityLevel = (percentage: number) => {
+        if (percentage >= 80) return 'extremely high';
+        if (percentage >= 60) return 'high';
+        if (percentage >= 40) return 'moderate';
+        if (percentage >= 20) return 'low';
+        return 'very low';
+      };
+
+      const analysis = `Analysis shows this user is ${quadrant === 'desperate' ? 'desperately seeking validation and attention' : quadrant === 'performative' ? 'performing for an audience rather than being authentic' : quadrant === 'cry-for-help' ? 'expressing genuine distress and seeking support' : 'intentionally provoking reactions and controversy'}. Their behavior breakdown: ${coordinatePercentages.desperate}% desperate tendencies (${getIntensityLevel(coordinatePercentages.desperate)}), ${coordinatePercentages.performative}% performative behavior (${getIntensityLevel(coordinatePercentages.performative)}), ${coordinatePercentages.cry_for_help}% cry for help signals (${getIntensityLevel(coordinatePercentages.cry_for_help)}), and ${coordinatePercentages.ragebaiter}% rage-baiting content (${getIntensityLevel(coordinatePercentages.ragebaiter)}).`;
+      
+      setUserData({
+        username: username.trim(),
+        profilePicture: '/apple-fun.jpg',
+        coordinates: aiResponse.coordinates,
+        percentages: coordinatePercentages,
+        quadrant: quadrant,
+        analysis: analysis,
+        confidence: aiResponse.confidence
+      });
+      
+      // Move profile picture to calculated position
+      setProfilePosition(position);
+      
+    } catch (error) {
+      console.error('Analysis error:', error);
+      alert(`Analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsAnalyzing(false);
+      setUsername('');
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -565,14 +553,14 @@ export default function Home() {
             </div>
             
             {/* Analysis Text - Better Formatted */}
-            <div className="bg-gray-50 border-2 border-gray-200 rounded-xl p-6 mb-8">
+            {/* <div className="bg-gray-50 border-2 border-gray-200 rounded-xl p-6 mb-8">
               <h3 className="text-lg font-bold text-gray-800 mb-4">Detailed Analysis</h3>
               <p className="text-base text-gray-700 leading-relaxed font-medium">
                 {userData.analysis}
               </p>
-            </div>
+            </div> */}
             
-            {/* Confidence Score - Bottom Center */}
+            {/* Confidence Score - Bottom Center
             <div className="text-center">
               <div className="inline-block bg-[#EF88AD] border-2 border-[#670D2F] rounded-xl px-10 py-6 shadow-md">
                 <p className="text-sm text-[#670D2F] font-bold mb-3 uppercase tracking-wide">AI Confidence</p>
@@ -580,7 +568,7 @@ export default function Home() {
                   {(userData.confidence * 100).toFixed(0)}%
                 </p>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       )}
@@ -600,7 +588,7 @@ export default function Home() {
           
           <div className="border-t border-[#A53860]/30 pt-6">
             <div className="text-center mb-4">
-              <p className="text-sm text-gray-600 mb-2">Made with ❤️ by</p>
+              <p className="text-sm text-gray-600 mb-2">Made with 🍍 by</p>
               <div className="flex justify-center items-center gap-4 text-sm">
                 <a 
                   href="https://x.com/combif1am" 

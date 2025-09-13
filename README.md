@@ -10,11 +10,7 @@ A fun Twitter personality analyzer that places users on a 4-dimensional "Chaos G
 - 📱 **Mobile Friendly**: Works perfectly on all devices
 - 📥 **Chart Export**: Download your personality chart as PNG image
 
-## Credits
-
-Made with ❤️ by [@combif1am](https://x.com/combif1am) & [@lowkeyverybored](https://x.com/lowkeyverybored)
-
-## Setup
+## Quick Start
 
 ### 1. Install Dependencies
 
@@ -24,17 +20,14 @@ npm install
 
 ### 2. Environment Variables
 
-Create a `.env.local` file in the root directory with:
+Create a `.env.local` file in the root directory:
 
 ```env
-# Twitter Analysis API Keys
 TAVILY_API_KEY=your_tavily_api_key_here
-GROQ_API_KEY=your_groq_api_key_here
 ```
 
-**Get API Keys:**
+**Get API Key:**
 - **Tavily**: [https://tavily.com/](https://tavily.com/) - For Twitter data search
-- **Groq**: [https://console.groq.com/](https://console.groq.com/) - For AI analysis
 
 ### 3. Run Development Server
 
@@ -43,6 +36,21 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Production Deployment
+
+### Build for Production
+
+```bash
+npm run build
+npm start
+```
+
+### Environment Variables for Production
+
+Make sure to set the following environment variables in your production environment:
+
+- `TAVILY_API_KEY`: Your Tavily API key
 
 ## How It Works
 
@@ -62,26 +70,10 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ## Tech Stack
 
 - **Frontend**: Next.js 15, React 19, TypeScript
-- **Styling**: Tailwind CSS 4, tw-animate-css
+- **Styling**: Tailwind CSS
 - **AI**: Groq AI SDK, Tavily Search API
 - **UI Components**: Radix UI, Lucide React icons
 - **Utilities**: html2canvas for chart export
-
-## Project Structure
-
-```
-oomf-analyzer/
-├── app/
-│   ├── api/analyze-twitter/    # Twitter analysis API endpoint
-│   ├── globals.css             # Global styles with Tailwind
-│   ├── layout.tsx              # Root layout
-│   └── page.tsx                # Main application page
-├── src/
-│   ├── components/ui/          # Reusable UI components
-│   └── lib/                    # Utility functions
-├── types/                      # TypeScript type definitions
-└── public/                     # Static assets
-```
 
 ## API Endpoints
 
@@ -111,12 +103,9 @@ Analyzes a Twitter user's personality.
 }
 ```
 
-## Contributing
+## Credits
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+Made with ❤️ by [@combif1am](https://x.com/combif1am) & [@lowkeyverybored](https://x.com/lowkeyverybored)
 
 ## License
 
