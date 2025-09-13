@@ -608,7 +608,7 @@ export default function Home() {
                   @lowkeyverybored
                 </a>
               </div>
-              <p className="text-xs text-gray-500 leading-relaxed">  Used Exa AI for gathering data, Groq for AI inference, Vercel for deployment, yayyyy </p>
+              <p className="text-xs text-gray-500 leading-relaxed">  Used Tavily for gathering data, Groq for AI inference, Vercel for deployment, yayyyy </p>
         </div>
 
 
