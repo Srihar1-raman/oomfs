@@ -610,6 +610,11 @@ export default function Home() {
               </div>
         </div>
 
+        <div className="text-center">
+          <p className="text-xs text-gray-500 leading-relaxed">  Used Exa AI for gathering data, Groq for AI inference, Vercel for deployment, yayyyy </p>
+
+        </div>
+
             <div className="text-center">
               <p className="text-xs text-gray-500 leading-relaxed"> <strong>Disclaimer:</strong> This tool is for entertainment and educational purposes only. All analysis results are AI-generated interpretations based on publicly available content and should not be considered as professional psychological assessment, medical advice, or factual personality evaluation. We do not store, collect, or retain personal data. Analysis is performed using legitimate third-party API services on publicly accessible content only. Results may not accurately reflect actual personality traits or behaviors. By using this tool, you acknowledge that you are doing so at your own discretion and risk. Use responsibly, respect others&apos; privacy, and do not use this tool to harass, discriminate against, or make important decisions about individuals. </p> 
             </div>
