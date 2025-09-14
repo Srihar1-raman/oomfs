@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface AICoordinates {
   desperate: number;
@@ -32,6 +33,7 @@ interface UserData {
 }
 
 export default function Home() {
+  const router = useRouter();
   const [username, setUsername] = useState('');
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -244,7 +246,8 @@ export default function Home() {
       
     } catch (error) {
       console.error('Analysis error:', error);
-      alert(`Analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      // Redirect to construction page when analysis fails
+      router.push('/construction');
     } finally {
       setIsAnalyzing(false);
       setUsername('');

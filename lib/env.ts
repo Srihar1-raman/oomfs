@@ -14,8 +14,3 @@ export function validateEnvironment() {
 
   return true
 }
-
-// Validate on import
-if (typeof window === 'undefined') {
-  validateEnvironment()
-}

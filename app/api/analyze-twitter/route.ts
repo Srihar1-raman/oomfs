@@ -4,9 +4,6 @@ import { generateText, wrapLanguageModel, extractReasoningMiddleware } from 'ai'
 import { TwitterAnalysisRequest, TwitterAnalysisError } from '@/types'
 import { validateEnvironment } from '@/lib/env'
 
-// Validate environment variables
-validateEnvironment()
-
 const tavilyClient = tavily({
     apiKey: process.env.TAVILY_API_KEY
 })
@@ -18,6 +15,9 @@ const enhancedModel = wrapLanguageModel({
 
 export async function POST(req: Request) {
     try {
+        // Validate environment variables at runtime
+        validateEnvironment()
+        
         const { username }: TwitterAnalysisRequest = await req.json()
 
         // Input validation
