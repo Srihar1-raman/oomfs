@@ -191,10 +191,14 @@ export default function Home() {
         body: JSON.stringify({ username: username.trim() }),
       });
       
-      // if (!response.ok) {
-      //   const errorData = await response.json();
-      //   throw new Error(errorData.error || 'Failed to analyze user');
-      // }
+        // Handle different error responses
+        if (!response.ok) {
+          const errorData = await response.json();
+          
+          // For any error, redirect to construction page
+          router.push('/construction');
+          return;
+        }
 
       const aiResponse: AIResponse = await response.json();
       
