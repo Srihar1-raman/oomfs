@@ -72,7 +72,12 @@ export default function Home() {
   }, [isAnalyzing]);
 
   // Convert AI coordinates to quadrant placement
-  const getQuadrantFromCoordinates = (coordinates: AICoordinates): 'desperate' | 'performative' | 'cry-for-help' | 'ragebaiter' => {
+  const getQuadrantFromCoordinates = (coordinates: AICoordinates | null | undefined): 'desperate' | 'performative' | 'cry-for-help' | 'ragebaiter' => {
+    // Handle null/undefined coordinates
+    if (!coordinates || typeof coordinates !== 'object') {
+      return 'desperate'; // Default fallback
+    }
+    
     // Find the highest coordinate value to determine dominant quadrant
     const maxValue = Math.max(...Object.values(coordinates));
     
@@ -83,7 +88,12 @@ export default function Home() {
   };
 
   // Convert coordinates to visual position on the grid
-  const getPositionFromCoordinates = (coordinates: AICoordinates) => {
+  const getPositionFromCoordinates = (coordinates: AICoordinates | null | undefined) => {
+    // Handle null/undefined coordinates
+    if (!coordinates || typeof coordinates !== 'object') {
+      return { x: 25, y: 25 }; // Default fallback position
+    }
+    
     // Map coordinates to grid positions
     // desperate: top-left, performative: top-right, cry_for_help: bottom-left, ragebaiter: bottom-right
     
@@ -186,16 +196,26 @@ export default function Home() {
 
       const aiResponse: AIResponse = await response.json();
       
+      // Validate AI response structure
+      if (!aiResponse || typeof aiResponse !== 'object') {
+        throw new Error('Invalid AI response format');
+      }
+      
       // Determine quadrant and position from AI coordinates
       const quadrant = getQuadrantFromCoordinates(aiResponse.coordinates);
       const position = getPositionFromCoordinates(aiResponse.coordinates);
       
       // Convert coordinates to percentages for better readability
-      const coordinatePercentages = {
+      const coordinatePercentages = aiResponse.coordinates ? {
         desperate: Math.round(((aiResponse.coordinates.desperate + 1) / 2) * 100),
         performative: Math.round(((aiResponse.coordinates.performative + 1) / 2) * 100),
         cry_for_help: Math.round(((aiResponse.coordinates.cry_for_help + 1) / 2) * 100),
         ragebaiter: Math.round(((aiResponse.coordinates.ragebaiter + 1) / 2) * 100)
+      } : {
+        desperate: 50,
+        performative: 50,
+        cry_for_help: 50,
+        ragebaiter: 50
       };
 
       // Generate analysis text
