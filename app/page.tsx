@@ -430,7 +430,7 @@ export default function Home() {
             {isDownloading ? 'downloading...' : '📥 download chart as image'}
           </button>
           <p className="text-gray-800 text-xs sm:text-sm mt-3 font-medium">
-            Download your personality chart with profile picture as a PNG image
+            Download your personality chart as a PNG image
           </p>
         </div>
       )}
