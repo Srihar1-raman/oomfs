@@ -1,6 +1,6 @@
 # OOMF Analyzer 🐦
 
-A fun Twitter personality analyzer that places users on a 4-dimensional "Chaos Grid" of personality traits. Built with Next.js, Tailwind CSS, and AI-powered analysis.
+A fun Twitter personality analyzer that places users on a 4-dimensional personality traits. Built with Next.js, Tailwind CSS, and AI-powered analysis.
 
 ## Features
 
